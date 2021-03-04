@@ -1,0 +1,12 @@
+{
+  "type": "service_account",
+  "project_id": "kamssa-1518387828762",
+  "private_key_id": "3043b8bb8b63fd67768267b3bf2146af68f66c3e",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQDfka6CDcYwlkuK\nKuW57+HDgcj+WZdf+jKVb2ZbYfhZ4XIAbvUX2SHyIMB4X2IG3Yqy5irWuVaru1KX\nVA6oHV67q8LSTVWGIgJNOg5Lyde2hc5i2pCzwjnqevK8Tpvf6i5Uo+2c+plCBkan\n5eDx1b6ltfjSKS+LtRw5tgUyVauJ5CcSfB1wfwI0jsf8U+u6qrJcwW1ExCfEdBkb\nZTXOP4xD6n8coh0w0Jk6jhDkHtrdsW9z/UHR+BHIHoOTze0SU2FrfUsodLSwXB3b\n1iPFeypEGDKpvnJLzoAC24mJ8IeMTDgCfERaek6TS0HDIzFC3UVb+650PTia7+Ol\ntJlQ2mSNAgMBAAECggEAbj08AtX+6XtaoTUY1M/zjz9CWCTeLw3EfooROzM6TjuL\nxqnvwcQn6Gf87/38bK02FJPJANsf4Qs7pPHmTkA5M6n0pVVLvBmt792WKgnLi608\nAOOMIY8+lp/sbC0I0Gb9VHAGnPa2tmc41NZVznmaicSKfjqfvrBdzBk0Q8cZkCJb\ndN7UzxsjmtKf5jgcfbaY7EHTSJRKEAB+0V7iS/LT3+O+tryvObl9bZGn9hmH43SD\nvxTLL1MTS48cOVaTysg1YWqSf+GGACHBC62CoaJXZSj/bUVAtA4DKjZqadamokvv\nHZy0r44lNmouCD84bQGA2XsQQOXjrDYqmgiEtsRfswKBgQD6LHUOBhKWwbZMIT0H\nvgQ8driufesFRY+iaygTZRSFsXHhYS8SO/bDxG54E/+9b30ssmwy0E6NmV4t969i\ndmosLybgVRNugz0FjjeTuPzcVOeS63wPly3yowxCjiFiJi0a1IfghJzZETCeQh6o\n2lQ78uxpxnf3aRAK7pJ4wrqDSwKBgQDkxptofXDAVwatt6uoe6U7SBryCT+544IK\nGqTj3mg8UARz3n4hOcH/5gcG5MMZKSNLX9eBhDyY5bZRoy3lofmlBEA8lP6v5Ij7\nRiH8BuysCt+0giF2Xoa9sCgn7ocQotOUVBJ/rcYRR6k/wo20/rQLvlbrgp9vWtsL\nG+INjFx4hwKBgHzfA+5kCZNGTX/id1wN9H9ZowU1xMF03yTq564Gnh+9WmJs59nq\nJFnDCoDVOqmLpKdSx771SsBS9TdskhZLlONJBdajoHdg+mxzeDo787rmhlBHSj1d\n8IlT6SKvXupms8zYmJnwl3mhourbhgIyOClUL7z8W5Ua0+8g9ethB0fRAoGASuGC\n/pmIbTxO8E9c/WGzPIsmXrCOTj7cUohUDk2+2nbqbi6WJDPuft8Az83S2gpwBfzR\n4g+xce5GVcROgooY111j1TCDiHkKKQzUlNSDZPCONlwdrcvU2IOvMRrO1LAnBrbZ\n8zaizQciq773eRWhQvLDKoTvwJgBeEphHEQkBEMCgYEAh1tqRTAF+2OyuDayDjF8\n/N7m+h9msKKD9dccY9BNCUpltKMkpCWBj+GDPekshFLB4rh7+JhknE9GvFAJd8a6\nAFW9/x6/7H4qUppCMaNAL4aQKQoBCESsFh5DZ7ji0K5KriJGelG+dgVUATnUm1Cb\n/BguY6QcE3gfA+Iwsj3RR2A=\n-----END PRIVATE KEY-----\n",
+  "client_email": "parkerbase@kamssa-1518387828762.iam.gserviceaccount.com",
+  "client_id": "114476316018294586694",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/parkerbase%40kamssa-1518387828762.iam.gserviceaccount.com"
+}
