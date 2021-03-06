@@ -14,17 +14,19 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import ci.parkerbase.entity.entreprise.Departement;
 import ci.parkerbase.entity.entreprise.Employe;
 import ci.parkerbase.entity.shared.Personne;
 import ci.parkerbase.entity.shared.Role;
@@ -57,6 +59,26 @@ public class EmployeController {
 	@Autowired
 	private ObjectMapper jsonMapper;
 
+	// recuper employe par identifiant
+		private Reponse<Employe> getEmployeById(Long id) {
+			Employe employe = null;
+
+			try {
+				employe = employeMetier.findById(id);
+				if (employe == null) {
+					List<String> messages = new ArrayList<>();
+					messages.add(String.format("employe n'existe pas", id));
+					new Reponse<Employe>(2, messages, null);
+
+				}
+			} catch (RuntimeException e) {
+				new Reponse<Employe>(1, Static.getErreursForException(e), null);
+			}
+
+			return new Reponse<Employe>(0, null, employe);
+		}
+
+	
 	@PostMapping("/signinEmploye")
 	public String authenticateUser(@Valid @RequestBody Personne loginRequest) throws JsonProcessingException {
 		Reponse<ResponseEntity<?>> reponse;
@@ -94,6 +116,35 @@ public class EmployeController {
 		}
 		return jsonMapper.writeValueAsString(reponse);
 	}
+	@PutMapping("/employe")
+	public String update(@RequestBody Employe  modif) throws JsonProcessingException {
+
+		Reponse<Employe> reponse = null;
+		Reponse<Employe> reponsePersModif = null;
+		// on recupere abonnement a modifier
+		System.out.println("modif recupere1:"+ modif);
+		reponsePersModif = getEmployeById(modif.getId());
+		if (reponsePersModif.getBody() != null) {
+			try {
+				System.out.println("modif recupere2:"+ modif);
+				Employe empl = employeMetier.modifier(modif);
+				List<String> messages = new ArrayList<>();
+				messages.add(String.format("%s a modifier avec succes", empl.getId()));
+				reponse = new Reponse<Employe>(0, messages, empl);
+			} catch (InvalideParkerBaseException e) {
+
+				reponse = new Reponse<Employe>(1, Static.getErreursForException(e), null);
+			}
+
+		} else {
+			List<String> messages = new ArrayList<>();
+			messages.add(String.format("Entreprise n'existe pas"));
+			reponse = new Reponse<Employe>(0, messages, null);
+		}
+
+		return jsonMapper.writeValueAsString(reponse);
+
+	}
 
 	// obtenir un employe par son id
 	@GetMapping("/employe/{id}")
@@ -128,5 +179,23 @@ public class EmployeController {
 		}
 		return jsonMapper.writeValueAsString(reponse);
 
+	}
+	@DeleteMapping("/employe/{id}")
+	public String supprimer(@PathVariable("id") Long id) throws JsonProcessingException {
+
+		Reponse<Boolean> reponse = null;
+
+		try {
+
+			List<String> messages = new ArrayList<>();
+			messages.add(String.format(" %s  a ete supprime", true));
+
+			reponse = new Reponse<Boolean>(0, messages, employeMetier.supprimer(id));
+
+		} catch (RuntimeException e1) {
+			reponse = new Reponse<>(3, Static.getErreursForException(e1), false);
+		}
+
+		return jsonMapper.writeValueAsString(reponse);
 	}
 }

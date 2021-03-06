@@ -7,5 +7,5 @@ import ci.parkerbase.metiers.Imetier;
 
 public interface IDepartementMetier extends Imetier<Departement, Long>{
 	List<Departement> getDepByIdEntreprise(Long id);
-
+	public Departement findDepartementByLibelle(String libelle);
 }

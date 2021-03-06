@@ -1,18 +1,20 @@
 package ci.parkerbase.metier.entreprise;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
-
-import org.springframework.web.multipart.MultipartFile;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+
 import com.amazonaws.AmazonClientException;
 import com.amazonaws.AmazonServiceException;
 import com.amazonaws.services.s3.AmazonS3;
@@ -21,7 +23,11 @@ import com.amazonaws.services.s3.model.ListObjectsRequest;
 import com.amazonaws.services.s3.model.ObjectListing;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.S3Object;
+import com.amazonaws.services.s3.model.S3ObjectInputStream;
 import com.amazonaws.services.s3.model.S3ObjectSummary;
+import com.amazonaws.util.IOUtils;
+
+import ci.parkerbase.entity.entreprise.Departement;
 
 @Service
 public class S3ServiceImpl implements S3ServiceMetier{
@@ -32,11 +38,12 @@ private Logger logger = LoggerFactory.getLogger(S3ServiceImpl.class);
  
 	@Value("${gkz.s3.bucket}")
 	private String bucketName;
-	
+	@Autowired
+	private IDepartementMetier departementMetier;
 	@Override
-	public ByteArrayOutputStream downloadFile(String keyName) {
+	public ByteArrayOutputStream downloadFiles(String depName,String keyName) {
 		try {
-            S3Object s3object = s3client.getObject(new GetObjectRequest(bucketName, keyName));
+            S3Object s3object = s3client.getObject(new GetObjectRequest(bucketName+"/"+ depName, keyName));
             
             InputStream is = s3object.getObjectContent();
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -67,12 +74,15 @@ private Logger logger = LoggerFactory.getLogger(S3ServiceImpl.class);
 	}
 
 	@Override
-	public void uploadFile(String keyName, MultipartFile file) {
+	public void uploadFile(String depName, String keyName, MultipartFile file) {
 		try {
 			ObjectMetadata metadata = new ObjectMetadata();
 			metadata.setContentLength(file.getSize());
 			System.out.println("Voir:" + file.getOriginalFilename());
-            s3client.putObject(bucketName, keyName, file.getInputStream(), metadata);
+			 Departement dep = departementMetier.findDepartementByLibelle(depName);
+			  String entreName = dep.getEntreprise().getNom();
+              s3client.putObject(bucketName+ "/"+ entreName + "/"+ depName, keyName, file.getInputStream(), metadata);
+            
 		} catch(IOException ioe) {
 			logger.error("IOException: " + ioe.getMessage());
 		} catch (AmazonServiceException ase) {
@@ -102,6 +112,7 @@ private Logger logger = LoggerFactory.getLogger(S3ServiceImpl.class);
 			List keys = new ArrayList<>();
 			
 			ObjectListing objects = s3client.listObjects(listObjectsRequest);
+                          
 			
 			while (true) {
 				List<S3ObjectSummary> summaries = objects.getObjectSummaries();
@@ -119,4 +130,38 @@ private Logger logger = LoggerFactory.getLogger(S3ServiceImpl.class);
 			
 			return keys;
 		}
+	private File convertMutilpartFileToFie(MultipartFile file) {
+		File converedFile = new File(file.getOriginalFilename());
+		try (FileOutputStream fos = new FileOutputStream(converedFile)){
+		fos.write(file.getBytes());	
+		} catch (Exception e) {
+		e.getMessage();
+		}
+		
+		return converedFile;
+	}
+
+	@Override
+	public byte[] downloadFile(String depName, String keyName) {
+		Departement dep = departementMetier.findDepartementByLibelle(depName);
+	    String entreName = dep.getEntreprise().getNom();
+		S3Object s3Object = s3client.getObject(bucketName+ "/"+ entreName + "/"+ depName, keyName);
+		S3ObjectInputStream inputStream = s3Object.getObjectContent();
+		byte[] content = null;
+		try {
+			 content = IOUtils.toByteArray(inputStream);
+			//return content;
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return content;
+	}
+
+	@Override
+	public String deleteFile(String depName, String keyName) {
+		Departement dep = departementMetier.findDepartementByLibelle(depName);
+	    String entreName = dep.getEntreprise().getNom();
+		s3client.deleteObject(bucketName+ "/"+ entreName + "/"+ depName, keyName);
+		return keyName + "élément supprimé";
+	}
 }

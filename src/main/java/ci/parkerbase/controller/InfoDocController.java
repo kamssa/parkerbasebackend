@@ -1,5 +1,6 @@
 package ci.parkerbase.controller;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -9,7 +10,11 @@ import java.util.List;
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -25,10 +30,13 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.firebase.database.core.Path;
 
+import ci.parkerbase.entity.entreprise.Departement;
 import ci.parkerbase.entity.entreprise.InfoDoc;
 import ci.parkerbase.metier.doc.ImageMetier;
 import ci.parkerbase.metier.doc.InfoDocMetier;
+import ci.parkerbase.metier.entreprise.IDepartementMetier;
 import ci.parkerbase.metier.entreprise.S3ServiceMetier;
+import ci.parkerbase.models.JwtAuthenticationResponse;
 import ci.parkerbase.models.Reponse;
 import ci.parkerbase.utilitaire.Static;
 
@@ -38,6 +46,8 @@ import ci.parkerbase.utilitaire.Static;
 public class InfoDocController {
 	@Autowired
 	InfoDocMetier documentMetier;
+	@Autowired
+	IDepartementMetier departementMetier;
 	@Autowired
 	ImageMetier imageMetier;
 	@Autowired
@@ -105,7 +115,19 @@ public class InfoDocController {
 		return jsonMapper.writeValueAsString(reponse);
 
 	}
+	// obtenir un infoDoc par son identifiant
+	@GetMapping("/infoDoc/{id}")
+	public String getDocById(@PathVariable Long id) throws JsonProcessingException {
+		Reponse<InfoDoc> reponse;
+		try {
+			InfoDoc db = documentMetier.findById(id);
+			reponse = new Reponse<InfoDoc>(0, null, db);
+		} catch (Exception e) {
+			reponse = new Reponse<>(1, Static.getErreursForException(e), null);
+		}
+		return jsonMapper.writeValueAsString(reponse);
 
+	}
 	@DeleteMapping("/infoDoc/{id}")
 	public String supprimer(@PathVariable("id") Long id) throws JsonProcessingException {
 
@@ -181,18 +203,48 @@ public class InfoDocController {
 	 * 
 	 */
 	@PostMapping("/file/upload")
-	public String uploadMultipartFile(@RequestParam Long id, @RequestParam("file") MultipartFile file) {
-		Reponse<InfoDoc> reponse = null;
-
+	public String uploadMultipartFile(@RequestParam Long id, @RequestParam("file") MultipartFile file) throws JsonProcessingException {
+		Reponse<ResponseEntity<?>> reponse;
+		System.out.println("Voir id:" + id);
+        Departement dep = departementMetier.findById(id);
+        String nomDep = dep.getLibelle();
 		String keyName = file.getOriginalFilename();
 		System.out.println("Voir ce qui se passe:" + keyName);
-		s3Services.uploadFile(keyName, file);
+        s3Services.uploadFile(nomDep, keyName, file);
 		List<String> messages = new ArrayList<>();
 		messages.add(String.format("Upload Successfully" + keyName));
-		reponse = new Reponse<InfoDoc>(0, messages, null);
-		return "Upload Successfully -> KeyName = " + keyName;
-	}
+		reponse = new Reponse<ResponseEntity<?>>(0, messages, null);
 
+		return jsonMapper.writeValueAsString(reponse);
+	}
+	@GetMapping("/file/download")
+	public ResponseEntity<ByteArrayResource> downloadFile(@RequestParam String depName,
+			@RequestParam String keyname) {
+            byte [] data = s3Services.downloadFile(depName, keyname);
+            ByteArrayResource resource = new ByteArrayResource(data);
+		    return ResponseEntity.ok()
+					.contentLength(data.length)
+					.header("content-type", "application/octet-stream")
+					.header(HttpHeaders.CONTENT_DISPOSITION,"attachment; filename=\"" + keyname + "\"")
+					.body(resource);
+		    
+						
+	}
+	
+	private MediaType contentType(String keyname) {
+		String[] arr = keyname.split("\\.");
+		String type = arr[arr.length-1];
+		switch(type) {
+			case "txt": return MediaType.TEXT_PLAIN;
+			case "png": return MediaType.IMAGE_PNG;
+			case "jpg": return MediaType.IMAGE_JPEG;
+			default: return MediaType.APPLICATION_OCTET_STREAM;
+		}
+	}
+	@DeleteMapping("/file/delete/{fileName}")
+	public ResponseEntity<String> deleteFile(@PathVariable String depName, @PathVariable String keyname){
+		return new ResponseEntity<>(s3Services.deleteFile(depName, keyname),HttpStatus.OK);
+	}
 	// recuperer les images du site
 	@GetMapping(value = "/getImage/{version}/{idE}/{idD}/{nomDoc}", produces = MediaType.IMAGE_JPEG_VALUE)
 	public byte[] getPhotosTravaux(@PathVariable Long version, @PathVariable Long idE, @PathVariable Long idD,

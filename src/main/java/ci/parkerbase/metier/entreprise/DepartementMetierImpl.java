@@ -22,7 +22,7 @@ private DepartementRepository departementRepository;
 	@Override
 	public Departement modifier(Departement entity) throws InvalideParkerBaseException {
 		// TODO Auto-generated method stub
-		return null;
+		return departementRepository.save(entity);
 	}
 
 	@Override
@@ -39,8 +39,8 @@ private DepartementRepository departementRepository;
 
 	@Override
 	public boolean supprimer(Long id) {
-		// TODO Auto-generated method stub
-		return false;
+		departementRepository.deleteById(id);
+		return true;
 	}
 
 	@Override
@@ -71,6 +71,11 @@ private DepartementRepository departementRepository;
 	public List<Departement> getDepByIdEntreprise(Long id) {
 		// TODO Auto-generated method stub
 		return departementRepository.getDepByIdEntreprise(id);
+	}
+
+	@Override
+	public Departement findDepartementByLibelle(String libelle) {
+		return departementRepository.getDepByLibelle(libelle);
 	}
 
 	

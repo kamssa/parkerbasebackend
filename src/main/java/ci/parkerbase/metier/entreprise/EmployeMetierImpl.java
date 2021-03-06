@@ -42,7 +42,7 @@ PasswordEncoder passwordEncoder;
 	@Override
 	public Employe modifier(Employe entity) throws InvalideParkerBaseException {
 		// TODO Auto-generated method stub
-		return null;
+		return employeRepository.save(entity);
 	}
 
 	@Override
@@ -59,8 +59,8 @@ PasswordEncoder passwordEncoder;
 
 	@Override
 	public boolean supprimer(Long id) {
-		// TODO Auto-generated method stub
-		return false;
+		employeRepository.deleteById(id);
+		return true;
 	}
 
 	@Override

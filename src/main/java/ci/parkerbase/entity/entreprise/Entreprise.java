@@ -16,10 +16,12 @@ public class Entreprise extends DateAudit{
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 	
+	
 	@Version
 	private Long version;
 	private String nom;
 	private String description;
+	//private boolean suspendu;
 	
 	public String getDescription() {
 		return description;
@@ -39,7 +41,13 @@ public class Entreprise extends DateAudit{
 	public void setNom(String nom) {
 		this.nom = nom;
 	}
-	
+	/*public boolean isSuspendu() {
+		return suspendu;
+	}
+	public void setSuspendu(boolean suspendu) {
+		this.suspendu = suspendu;
+	}
+	*/
 	
 	
 }
