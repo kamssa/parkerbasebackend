@@ -39,9 +39,10 @@ public class PersonneMetierImpl implements IPersonneMetier{
 	}
 
 	@Override
-	public Personne modifier(Personne entity) throws InvalideParkerBaseException {
-		// TODO Auto-generated method stub
-		return null;
+	public Personne modifier(Personne modif) throws InvalideParkerBaseException {
+		modif.setPassword(passwordEncoder.encode(modif.getPassword()));
+		return personneReposiory.save(modif);
+
 	}
 
 	@Override

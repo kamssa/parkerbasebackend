@@ -15,6 +15,6 @@ import ci.parkerbase.entity.entreprise.InfoDoc;
 public interface InfoDocRepository extends JpaRepository<InfoDoc, Long>{
 	Optional<InfoDoc> findByLibelle(String libelle);
 	Optional<InfoDoc> findByNomDoc(String nomDoc);
-	@Query("select infoDoc from InfoDoc infoDoc where infoDoc.description LIKE %?1%")
-	List<InfoDoc> chercherInfoDocParMc(@Param("description") String mc);
+	@Query("select infoDoc from InfoDoc infoDoc where infoDoc.description LIKE %?1% AND infoDoc.departement.id=?2")
+	List<InfoDoc> chercherInfoDocParMc(String description, long id);
 }

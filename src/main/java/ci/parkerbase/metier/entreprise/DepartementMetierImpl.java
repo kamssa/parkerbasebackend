@@ -15,7 +15,6 @@ public class DepartementMetierImpl implements IDepartementMetier{
 private DepartementRepository departementRepository;
 	@Override
 	public Departement creer(Departement entity) throws InvalideParkerBaseException {
-		// TODO Auto-generated method stub
 		return departementRepository.save(entity);
 	}
 

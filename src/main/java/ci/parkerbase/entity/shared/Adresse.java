@@ -5,7 +5,7 @@ import javax.persistence.Embeddable;
 @Embeddable
 public class Adresse {
 	private String boitePostal;
-    private String mail;
+   
 	private String pays;
 	private String ville;
 	private String siteWeb;
@@ -18,10 +18,9 @@ public class Adresse {
 		super();
 	}
 
-public Adresse(String boitePostal, String mail, String pays, String ville, String siteWeb, String telephone) {
+public Adresse(String boitePostal, String pays, String ville, String siteWeb, String telephone) {
 		super();
 		this.boitePostal = boitePostal;
-		this.mail = mail;
 		this.pays = pays;
 		this.ville = ville;
 		this.siteWeb = siteWeb;
@@ -31,12 +30,7 @@ public Adresse(String boitePostal, String mail, String pays, String ville, Strin
 	public void setBoitePostal(String boitePostal) {
 		this.boitePostal = boitePostal;
 	}
-	public String getMail() {
-		return mail;
-	}
-	public void setMail(String mail) {
-		this.mail = mail;
-	}
+	
 	public String getPays() {
 		return pays;
 	}

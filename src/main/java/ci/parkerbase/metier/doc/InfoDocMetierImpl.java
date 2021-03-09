@@ -19,74 +19,63 @@ public class InfoDocMetierImpl implements InfoDocMetier {
 
 	@Override
 	public InfoDoc creer(InfoDoc entity) {
-		// TODO Auto-generated method stub
 		return documentRepo.save(entity);
 	}
 
 	@Override
 	public InfoDoc modifier(InfoDoc entity) {
-		// TODO Auto-generated method stub
 		return documentRepo.save(entity);
 	}
 
 	@Override
 	public List<InfoDoc> findAll() {
-		// TODO Auto-generated method stub
 		return documentRepo.findAll();
 	}
 
 	@Override
 	public InfoDoc findById(Long id) {
-		// TODO Auto-generated method stub
-		return null;
+		return documentRepo.findById(id).get();
 	}
 
 	@Override
 	public boolean supprimer(Long id) {
-		// TODO Auto-generated method stub
-		return false;
+		documentRepo.deleteById(id);
+		return true;
 	}
 
 	@Override
 	public boolean supprimer(List<InfoDoc> entites) {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
 	@Override
 	public boolean existe(Long id) {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
 	@Override
 	public Boolean existsByPseudo(String pseudo) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public Boolean existsByEmail(String email) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public InfoDoc findByLibelle(String libelle) {
-		// TODO Auto-generated method stub
 		return documentRepo.findByLibelle(libelle).get();
 	}
 
 	@Override
 	public InfoDoc findByNomDoc(String nomDoc) {
-		// TODO Auto-generated method stub
 		return documentRepo.findByNomDoc(nomDoc).get();
 	}
 
 	@Override
-	public List<InfoDoc> chercherInfoDocParMc(String mc) {
-		// TODO Auto-generated method stub
-		return documentRepo.chercherInfoDocParMc(mc);
+	public List<InfoDoc> chercherInfoDocParMc(String mc, Long id) {
+		return documentRepo.chercherInfoDocParMc(mc, id);
 	}
 	
 	

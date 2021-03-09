@@ -40,9 +40,11 @@ PasswordEncoder passwordEncoder;
 	}
 
 	@Override
-	public Employe modifier(Employe entity) throws InvalideParkerBaseException {
-		// TODO Auto-generated method stub
-		return employeRepository.save(entity);
+	public Employe modifier(Employe modif) throws InvalideParkerBaseException {
+
+		modif.setPassword(passwordEncoder.encode(modif.getPassword()));
+		return employeRepository.save(modif);
+
 	}
 
 	@Override

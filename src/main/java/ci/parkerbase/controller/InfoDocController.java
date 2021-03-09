@@ -1,12 +1,12 @@
 package ci.parkerbase.controller;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -28,15 +29,14 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.firebase.database.core.Path;
 
 import ci.parkerbase.entity.entreprise.Departement;
 import ci.parkerbase.entity.entreprise.InfoDoc;
+import ci.parkerbase.exception.InvalideParkerBaseException;
 import ci.parkerbase.metier.doc.ImageMetier;
 import ci.parkerbase.metier.doc.InfoDocMetier;
 import ci.parkerbase.metier.entreprise.IDepartementMetier;
 import ci.parkerbase.metier.entreprise.S3ServiceMetier;
-import ci.parkerbase.models.JwtAuthenticationResponse;
 import ci.parkerbase.models.Reponse;
 import ci.parkerbase.utilitaire.Static;
 
@@ -91,6 +91,35 @@ public class InfoDocController {
 
 		return jsonMapper.writeValueAsString(reponse);
 	}
+	@PutMapping("/infoDoc")
+	public String update(@RequestBody InfoDoc  modif) throws JsonProcessingException {
+
+		Reponse<InfoDoc> reponse = null;
+		Reponse<InfoDoc> reponsePersModif = null;
+		// on recupere abonnement a modifier
+		System.out.println("modif recupere1:"+ modif);
+		reponsePersModif = getInfoDocById(modif.getId());
+		if (reponsePersModif.getBody() != null) {
+			try {
+				System.out.println("modif recupere2:"+ modif);
+				InfoDoc infoDoc = documentMetier.modifier(modif);
+				List<String> messages = new ArrayList<>();
+				messages.add(String.format("%s a modifier avec succes", infoDoc.getId()));
+				reponse = new Reponse<InfoDoc>(0, messages, infoDoc);
+			} catch (InvalideParkerBaseException e) {
+
+				reponse = new Reponse<InfoDoc>(1, Static.getErreursForException(e), null);
+			}
+
+		} else {
+			List<String> messages = new ArrayList<>();
+			messages.add(String.format("Entreprise n'existe pas"));
+			reponse = new Reponse<InfoDoc>(0, messages, null);
+		}
+
+		return jsonMapper.writeValueAsString(reponse);
+
+	}
 
 ////////////////////////////////////////////////////////////////////////////////////// base/////////////////////////////////////
 //////// ramener tous les documents//////////////////////////////////////////////////
@@ -137,9 +166,10 @@ public class InfoDocController {
 
 			List<String> messages = new ArrayList<>();
 			messages.add(String.format(" %s  a ete supprime", true));
-
+			InfoDoc db = documentMetier.findById(id);
+			s3Services.deleteFile(db.getDepartement().getLibelle(), db.getNomDoc());
 			reponse = new Reponse<Boolean>(0, messages, documentMetier.supprimer(id));
-
+              
 		} catch (RuntimeException e1) {
 			reponse = new Reponse<>(3, Static.getErreursForException(e1), false);
 		}
@@ -149,11 +179,12 @@ public class InfoDocController {
 
 ////////rechercher un infoDoc par mot cle
 	@GetMapping("/rechemc")
-	public String chercherTravauxByMc(@RequestParam(value = "mc") String mc) throws JsonProcessingException {
+	public String chercherTravauxByMc(@RequestParam(value = "mc") String mc, 
+			@RequestParam(value = "id") Long id) throws JsonProcessingException {
 
 		Reponse<List<InfoDoc>> reponse;
 		try {
-			List<InfoDoc> infoDoc = documentMetier.chercherInfoDocParMc(mc);
+			List<InfoDoc> infoDoc = documentMetier.chercherInfoDocParMc(mc, id);
 
 			if (!infoDoc.isEmpty()) {
 				reponse = new Reponse<List<InfoDoc>>(0, null, infoDoc);
