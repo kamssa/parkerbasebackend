@@ -9,5 +9,7 @@ public interface InfoDocMetier extends Imetier<InfoDoc, Long> {
 	InfoDoc findByLibelle(String libelle);
 	InfoDoc findByNomDoc(String nomDoc);
 	List<InfoDoc> chercherInfoDocParMc(String mc, Long id);
+	List<InfoDoc> chercherInfoDocParEntrepriseMc(String mc, long id);
+
 	
 	}

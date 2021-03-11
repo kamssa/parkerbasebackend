@@ -203,6 +203,10 @@ public class Personne extends DateAudit {
 	}
 
 	
+	public void setNomComplet(String nomComplet) {
+		this.nomComplet = nomComplet;
+	}
+
 	@PrePersist
 	public void setNomComplet() {
 		this.nomComplet = nom + " " + prenom;

@@ -17,6 +17,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import ci.parkerbase.entity.entreprise.Departement;
+import ci.parkerbase.entity.entreprise.Employe;
 import ci.parkerbase.entity.entreprise.Entreprise;
 import ci.parkerbase.exception.InvalideParkerBaseException;
 import ci.parkerbase.metier.entreprise.IEntrepriseMetier;
@@ -103,6 +105,7 @@ public class EntrepriseController {
 		return jsonMapper.writeValueAsString(reponse);
 
 	}
+	
 	// obtenir une location par son identifiant
 	@GetMapping("/entreprise/{id}")
 	public String getEntrepriseById(@PathVariable Long id) throws JsonProcessingException {

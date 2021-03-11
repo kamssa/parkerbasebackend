@@ -60,22 +60,22 @@ public class EmployeController {
 	private ObjectMapper jsonMapper;
 
 	// recuper employe par identifiant
-		private Reponse<Personne> getEmployeById(Long id) {
-			Personne employe = null;
+		private Reponse<Employe> getEmployeById(Long id) {
+			Employe employe = null;
 
 			try {
-				employe = personneMetier.findById(id);
+				employe = employeMetier.findById(id);
 				if (employe == null) {
 					List<String> messages = new ArrayList<>();
 					messages.add(String.format("employe n'existe pas", id));
-					new Reponse<Personne>(2, messages, null);
+					new Reponse<Employe>(2, messages, null);
 
 				}
 			} catch (RuntimeException e) {
-				new Reponse<Personne>(1, Static.getErreursForException(e), null);
+				new Reponse<Employe>(1, Static.getErreursForException(e), null);
 			}
 
-			return new Reponse<Personne>(0, null, employe);
+			return new Reponse<Employe>(0, null, employe);
 		}
 
 	
@@ -117,29 +117,28 @@ public class EmployeController {
 		return jsonMapper.writeValueAsString(reponse);
 	}
 	@PutMapping("/employe")
-	public String update(@RequestBody Personne  modif) throws JsonProcessingException {
-
-		Reponse<Personne> reponse = null;
-		Reponse<Personne> reponsePersModif = null;
-		// on recupere abonnement a modifier
+	public String update(@RequestBody Employe  modif) throws JsonProcessingException {
 		System.out.println("modif recupere1:"+ modif);
+		Reponse<Employe> reponse = null;
+		Reponse<Employe> reponsePersModif = null;
 		reponsePersModif = getEmployeById(modif.getId());
 		if (reponsePersModif.getBody() != null) {
 			try {
 				System.out.println("modif recupere2:"+ modif);
-				Personne empl = personneMetier.modifier(modif);
+				
+				Employe empl = employeMetier.modifier(modif);
 				List<String> messages = new ArrayList<>();
 				messages.add(String.format("%s a modifier avec succes", empl.getId()));
-				reponse = new Reponse<Personne>(0, messages, empl);
+				reponse = new Reponse<Employe>(0, messages, empl);
 			} catch (InvalideParkerBaseException e) {
 
-				reponse = new Reponse<Personne>(1, Static.getErreursForException(e), null);
+				reponse = new Reponse<Employe>(1, Static.getErreursForException(e), null);
 			}
 
 		} else {
 			List<String> messages = new ArrayList<>();
-			messages.add(String.format("Entreprise n'existe pas"));
-			reponse = new Reponse<Personne>(0, messages, null);
+			messages.add(String.format("Employe n'existe pas"));
+			reponse = new Reponse<Employe>(0, messages, null);
 		}
 
 		return jsonMapper.writeValueAsString(reponse);
@@ -159,7 +158,25 @@ public class EmployeController {
 		return jsonMapper.writeValueAsString(reponse);
 
 	}
+	@GetMapping("/getEmployeByidEntreprise/{id}")
+	public String getEmplEntreprise(@PathVariable Long id) throws JsonProcessingException {
+		Reponse<List<Employe>> reponse;
+		try {
+			List<Employe> empl = employeMetier.getDepByIdEntreprise(id);
+			if (!empl.isEmpty()) {
+				reponse = new Reponse<List<Employe>>(0, null, empl);
+			} else {
+				List<String> messages = new ArrayList<>();
+				messages.add("Pas de Employe enregistrés");
+				reponse = new Reponse<List<Employe>>(1, messages, new ArrayList<>());
+			}
 
+		} catch (Exception e) {
+			reponse = new Reponse<>(1, Static.getErreursForException(e), null);
+		}
+		return jsonMapper.writeValueAsString(reponse);
+
+	}
 	// get all employe
 	@GetMapping("/employe")
 	public String findAll() throws JsonProcessingException {

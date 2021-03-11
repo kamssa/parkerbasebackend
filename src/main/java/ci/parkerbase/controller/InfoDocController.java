@@ -200,6 +200,29 @@ public class InfoDocController {
 		return jsonMapper.writeValueAsString(reponse);
 
 	}
+////////rechercher un infoDoc par mot cle
+@GetMapping("/recheParentreprisemc")
+public String chercherDocParByMc(@RequestParam(value = "mc") String mc, 
+		@RequestParam(value = "id") Long id) throws JsonProcessingException {
+
+	Reponse<List<InfoDoc>> reponse;
+	try {
+		List<InfoDoc> infoDoc = documentMetier.chercherInfoDocParEntrepriseMc(mc, id);
+
+		if (!infoDoc.isEmpty()) {
+			reponse = new Reponse<List<InfoDoc>>(0, null, infoDoc);
+		} else {
+			List<String> messages = new ArrayList<>();
+			messages.add("Pas de infoDoc info enregistrés");
+			reponse = new Reponse<List<InfoDoc>>(2, messages, new ArrayList<>());
+		}
+
+	} catch (Exception e) {
+		reponse = new Reponse<List<InfoDoc>>(1, Static.getErreursForException(e), new ArrayList<>());
+	}
+	return jsonMapper.writeValueAsString(reponse);
+
+}
 
 	// uploader plusieurs images
 	/*

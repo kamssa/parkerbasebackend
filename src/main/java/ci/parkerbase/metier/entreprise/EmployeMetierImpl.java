@@ -1,5 +1,6 @@
 package ci.parkerbase.metier.entreprise;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -8,14 +9,19 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import ci.parkerbase.dao.EmployeRepository;
+import ci.parkerbase.dao.RoleRepository;
 import ci.parkerbase.entity.entreprise.Employe;
 import ci.parkerbase.entity.shared.Personne;
+import ci.parkerbase.entity.shared.Role;
+import ci.parkerbase.entity.shared.RoleName;
 import ci.parkerbase.exception.InvalideParkerBaseException;
 
 @Service
 public class EmployeMetierImpl implements IEmployeMetier{
 @Autowired
 private EmployeRepository employeRepository;
+@Autowired
+private RoleRepository roleRepository;
 @Autowired
 PasswordEncoder passwordEncoder;
 
@@ -41,11 +47,14 @@ PasswordEncoder passwordEncoder;
 
 	@Override
 	public Employe modifier(Employe modif) throws InvalideParkerBaseException {
-
-		modif.setPassword(passwordEncoder.encode(modif.getPassword()));
-		return employeRepository.save(modif);
-
-	}
+		 String nomComplet = modif.getNom() + " " + modif.getPrenom();
+		 modif.setNomComplet(nomComplet);
+	     modif.setPassword(passwordEncoder.encode(modif.getPassword()));
+         Employe empl=  employeRepository.findById(modif.getId()).get();
+         Role userRole = roleRepository.findByName(RoleName.ROLE_EMPLOYE).get();
+         modif.setRoles(Collections.singleton(userRole));
+         return employeRepository.save(modif);
+}
 
 	@Override
 	public List<Employe> findAll() {
@@ -87,6 +96,12 @@ PasswordEncoder passwordEncoder;
 	public Boolean existsByEmail(String email) {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	@Override
+	public List<Employe> getDepByIdEntreprise(Long id) {
+		
+		return employeRepository.getEmployeByIdEntreprise(id);
 	}
 
 	
