@@ -1,0 +1,78 @@
+package ci.parkerbase.metier.entreprise;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import ci.parkerbase.dao.DossierRepository;
+import ci.parkerbase.entity.entreprise.Dossier;
+import ci.parkerbase.exception.InvalideParkerBaseException;
+
+@Service
+public class DossierMetierImpl implements IDossierMetier{
+@Autowired
+private DossierRepository dossierRepository;
+	@Override
+	public Dossier creer(Dossier entity) throws InvalideParkerBaseException {
+			
+		return dossierRepository.save(entity);
+	}
+
+	@Override
+	public Dossier modifier(Dossier entity) throws InvalideParkerBaseException {
+		return dossierRepository.save(entity);
+	}
+
+	@Override
+	public List<Dossier> findAll() {
+		return dossierRepository.findAll();
+	}
+
+	@Override
+	public Dossier findById(Long id) {
+		return dossierRepository.findById(id).get();
+	}
+
+	@Override
+	public boolean supprimer(Long id) {
+    dossierRepository.deleteById(id);
+	return true;
+	}
+
+	@Override
+	public boolean supprimer(List<Dossier> entites) {
+		return false;
+	}
+
+	@Override
+	public boolean existe(Long id) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public Boolean existsByPseudo(String pseudo) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Boolean existsByEmail(String email) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public List<Dossier> getDossierByIdDep(long id) {
+		// TODO Auto-generated method stub
+		return dossierRepository.getDossierByIdDep(id);
+	}
+
+	@Override
+	public Dossier getDossierById(long id) {
+		// TODO Auto-generated method stub
+		return dossierRepository.getDossierById(id);
+	}
+
+}

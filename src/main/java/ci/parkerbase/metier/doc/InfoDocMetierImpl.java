@@ -82,6 +82,16 @@ public class InfoDocMetierImpl implements InfoDocMetier {
 	public List<InfoDoc> chercherInfoDocParEntrepriseMc(String mc, long id) {
 		return documentRepo.chercherInfoDocParEntrepriseMc(mc, id);
 	}
+
+	@Override
+	public List<InfoDoc> getInfoDocParDep(long id) {
+		return documentRepo.getInfoDocParDep(id);
+	}
+
+	@Override
+	public List<InfoDoc> getInfoDocParEntr(long id) {
+		return documentRepo.getInfoDocParEntr(id);
+	}
 	
 	
 }

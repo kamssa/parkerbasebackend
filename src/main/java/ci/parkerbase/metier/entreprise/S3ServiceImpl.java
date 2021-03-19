@@ -74,14 +74,14 @@ private Logger logger = LoggerFactory.getLogger(S3ServiceImpl.class);
 	}
 
 	@Override
-	public void uploadFile(String depName, String keyName, MultipartFile file) {
+	public void uploadFile(String depName, String dosName, String keyName, MultipartFile file) {
 		try {
 			ObjectMetadata metadata = new ObjectMetadata();
 			metadata.setContentLength(file.getSize());
 			System.out.println("Voir:" + file.getOriginalFilename());
 			 Departement dep = departementMetier.findDepartementByLibelle(depName);
-			  String entreName = dep.getEntreprise().getNom();
-              s3client.putObject(bucketName+ "/"+ entreName + "/"+ depName, keyName, file.getInputStream(), metadata);
+			 String entreName = dep.getEntreprise().getNom();
+             s3client.putObject(bucketName+ "/"+ entreName + "/"+ depName + "/" + dosName, keyName, file.getInputStream(), metadata);
             
 		} catch(IOException ioe) {
 			logger.error("IOException: " + ioe.getMessage());
@@ -142,10 +142,10 @@ private Logger logger = LoggerFactory.getLogger(S3ServiceImpl.class);
 	}
 
 	@Override
-	public byte[] downloadFile(String depName, String keyName) {
+	public byte[] downloadFile(String depName, String nomDossier, String keyName) {
 		Departement dep = departementMetier.findDepartementByLibelle(depName);
 	    String entreName = dep.getEntreprise().getNom();
-		S3Object s3Object = s3client.getObject(bucketName+ "/"+ entreName + "/"+ depName, keyName);
+		S3Object s3Object = s3client.getObject(bucketName+ "/"+ entreName + "/"+ depName +"/"+ nomDossier, keyName);
 		S3ObjectInputStream inputStream = s3Object.getObjectContent();
 		byte[] content = null;
 		try {
@@ -163,5 +163,11 @@ private Logger logger = LoggerFactory.getLogger(S3ServiceImpl.class);
 	    String entreName = dep.getEntreprise().getNom();
 		s3client.deleteObject(bucketName+ "/"+ entreName + "/"+ depName, keyName);
 		return keyName + "élément supprimé";
+	}
+
+	@Override
+	public List listFiles(String depName, String nomDossier, String keyName) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

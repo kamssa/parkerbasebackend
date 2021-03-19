@@ -71,10 +71,14 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                     .antMatchers("/api/auth/**","/api/infoDoc/**",
                     		"/api/rechemc/**","/api/file/upload/**",
                     		"/api/getImage/**",
+                    		"/api/dossier/**",
+                    		"/api/getDossierByidDep/**",
                     		"/api/departement/**",
                     		"/api/file/download/**",
                     		"/api/getDepartementByidEntreprise/**",
-                    		"/api/recheParentreprisemc/**")
+                    		"/api/recheParentreprisemc/**",
+                    		"/api/infoDocParEntreprise/**",
+                    		"/api/infoDocParDep/**")
                         .permitAll()
                     .anyRequest()
                         .authenticated();

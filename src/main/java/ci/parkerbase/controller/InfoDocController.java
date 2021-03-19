@@ -31,11 +31,13 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import ci.parkerbase.entity.entreprise.Departement;
+import ci.parkerbase.entity.entreprise.Dossier;
 import ci.parkerbase.entity.entreprise.InfoDoc;
 import ci.parkerbase.exception.InvalideParkerBaseException;
 import ci.parkerbase.metier.doc.ImageMetier;
 import ci.parkerbase.metier.doc.InfoDocMetier;
 import ci.parkerbase.metier.entreprise.IDepartementMetier;
+import ci.parkerbase.metier.entreprise.IDossierMetier;
 import ci.parkerbase.metier.entreprise.S3ServiceMetier;
 import ci.parkerbase.models.Reponse;
 import ci.parkerbase.utilitaire.Static;
@@ -48,6 +50,8 @@ public class InfoDocController {
 	InfoDocMetier documentMetier;
 	@Autowired
 	IDepartementMetier departementMetier;
+	@Autowired
+	IDossierMetier dossierMetier;
 	@Autowired
 	ImageMetier imageMetier;
 	@Autowired
@@ -157,6 +161,45 @@ public class InfoDocController {
 		return jsonMapper.writeValueAsString(reponse);
 
 	}
+	// obtenir un infoDoc par son identifiant
+		@GetMapping("/infoDocParDep/{id}")
+		public String getDocByIdDep(@PathVariable Long id) throws JsonProcessingException {
+			Reponse<List<InfoDoc>> reponse;
+			try {
+				List<InfoDoc> pers = documentMetier.getInfoDocParDep(id);
+				if (!pers.isEmpty()) {
+					reponse = new Reponse<List<InfoDoc>>(0, null, pers);
+				} else {
+					List<String> messages = new ArrayList<>();
+					messages.add("Pas de infodoc enregistrés");
+					reponse = new Reponse<List<InfoDoc>>(1, messages, new ArrayList<>());
+				}
+
+			} catch (Exception e) {
+				reponse = new Reponse<>(1, Static.getErreursForException(e), null);
+			}
+			return jsonMapper.writeValueAsString(reponse);
+
+		}
+		// obtenir un infoDoc par son identifiant
+		@GetMapping("/infoDocParEntreprise/{id}")
+		public String getDocByIdEntr(@PathVariable Long id) throws JsonProcessingException {
+			Reponse<List<InfoDoc>> reponse;
+			try {
+				List<InfoDoc> pers = documentMetier.getInfoDocParEntr(id);
+				if (!pers.isEmpty()) {
+					reponse = new Reponse<List<InfoDoc>>(0, null, pers);
+				} else {
+					List<String> messages = new ArrayList<>();
+					messages.add("Pas de infodoc enregistrés");
+					reponse = new Reponse<List<InfoDoc>>(1, messages, new ArrayList<>());
+				}
+
+			} catch (Exception e) {
+				reponse = new Reponse<>(1, Static.getErreursForException(e), null);
+			}
+			return jsonMapper.writeValueAsString(reponse);
+		}
 	@DeleteMapping("/infoDoc/{id}")
 	public String supprimer(@PathVariable("id") Long id) throws JsonProcessingException {
 
@@ -224,47 +267,18 @@ public String chercherDocParByMc(@RequestParam(value = "mc") String mc,
 
 }
 
-	// uploader plusieurs images
-	/*
-	 * @PostMapping("/image") public String creerImage(@RequestParam(name =
-	 * "image_doc") MultipartFile file) throws Exception { Reponse<InfoDoc> reponse
-	 * = null; Reponse<InfoDoc> reponseParLibelle; // recuperer le libelle à partir
-	 * du nom de la photo String nomDoc = file.getOriginalFilename();
-	 * System.out.println("voir le libelle:" + nomDoc); InfoDoc b =
-	 * documentMetier.findByNomDoc(nomDoc);
-	 * 
-	 * System.out.println("voir infoDoc:"+b); String path =
-	 * "http://localhost:8080/getImage/" + b.getVersion()+ "/" + b.getIdEntreprise()
-	 * + "/" + b.getDepartement().getId()+"/"+ nomDoc; String dossier = archives +
-	 * "archives" + "/"+ b.getIdEntreprise() +"/"+ b.getDepartement().getId()+"/";
-	 * 
-	 * File rep = new File(dossier);
-	 * 
-	 * if (!file.isEmpty()) { if (!rep.exists() && !rep.isDirectory()) {
-	 * rep.mkdir(); } } try { // enregistrer le chemin dans la photo
-	 * b.setPathImage(path); System.out.println(path); System.out.println(dossier);
-	 * file.transferTo(new File(dossier + file.getOriginalFilename())); List<String>
-	 * messages = new ArrayList<>();
-	 * messages.add(String.format("%s (image ajouter avec succes)",
-	 * b.getLibelle())); reponse = new Reponse<InfoDoc>(0, messages,
-	 * documentMetier.modifier(b));
-	 * 
-	 * } catch (Exception e) {
-	 * 
-	 * reponse = new Reponse<InfoDoc>(1, Static.getErreursForException(e), null); }
-	 * 
-	 * return jsonMapper.writeValueAsString(reponse); }
-	 * 
-	 */
+	
 	@PostMapping("/file/upload")
 	public String uploadMultipartFile(@RequestParam Long id, @RequestParam("file") MultipartFile file) throws JsonProcessingException {
 		Reponse<ResponseEntity<?>> reponse;
 		System.out.println("Voir id:" + id);
-        Departement dep = departementMetier.findById(id);
+		Dossier dossier = dossierMetier.findById(id);
+		String nomDossier = dossier.getLibelle();
+        Departement dep = dossier.getDepartement();
         String nomDep = dep.getLibelle();
 		String keyName = file.getOriginalFilename();
 		System.out.println("Voir ce qui se passe:" + keyName);
-        s3Services.uploadFile(nomDep, keyName, file);
+        s3Services.uploadFile(nomDep,nomDossier, keyName, file);
 		List<String> messages = new ArrayList<>();
 		messages.add(String.format("Upload Successfully" + keyName));
 		reponse = new Reponse<ResponseEntity<?>>(0, messages, null);
@@ -272,9 +286,17 @@ public String chercherDocParByMc(@RequestParam(value = "mc") String mc,
 		return jsonMapper.writeValueAsString(reponse);
 	}
 	@GetMapping("/file/download")
-	public ResponseEntity<ByteArrayResource> downloadFile(@RequestParam String depName,
+	public ResponseEntity<ByteArrayResource> downloadFile(
+			@RequestParam Long id,
 			@RequestParam String keyname) {
-            byte [] data = s3Services.downloadFile(depName, keyname);
+		    System.out.println("voir dossier retourné: "+id);
+		    System.out.println("voir dossier retourné: "+ keyname);
+		    Dossier dossier = dossierMetier.getDossierById(id);
+		    System.out.println("voir dossier retourné: "+ dossier);
+		    String nomDossier = dossier.getLibelle();
+            Departement dep = dossier.getDepartement();
+            String depName = dep.getLibelle();
+            byte [] data = s3Services.downloadFile(depName, nomDossier, keyname);
             ByteArrayResource resource = new ByteArrayResource(data);
 		    return ResponseEntity.ok()
 					.contentLength(data.length)

@@ -31,6 +31,9 @@ public class InfoDoc extends DateAudit {
 	@ManyToOne(fetch = FetchType.LAZY, cascade= CascadeType.MERGE)
 	@JoinColumn(name = "id_Departement")
 	private Departement departement;
+	@ManyToOne(fetch = FetchType.LAZY, cascade= CascadeType.MERGE)
+	@JoinColumn(name = "id_Dossier")
+	private Dossier dossier;
 	private Long idEntreprise;
 	private String pathImage;
 	public InfoDoc() {
@@ -108,6 +111,14 @@ public class InfoDoc extends DateAudit {
 
 	public Long getVersion() {
 		return version;
+	}
+
+	public Dossier getDossier() {
+		return dossier;
+	}
+
+	public void setDossier(Dossier dossier) {
+		this.dossier = dossier;
 	}
 
 	@Override
