@@ -158,10 +158,10 @@ private Logger logger = LoggerFactory.getLogger(S3ServiceImpl.class);
 	}
 
 	@Override
-	public String deleteFile(String depName, String keyName) {
+	public String deleteFile(String depName, String dosName, String keyName) {
 		Departement dep = departementMetier.findDepartementByLibelle(depName);
 	    String entreName = dep.getEntreprise().getNom();
-		s3client.deleteObject(bucketName+ "/"+ entreName + "/"+ depName, keyName);
+		s3client.deleteObject(bucketName+ "/"+ entreName + "/"+ depName +"/"+ dosName, keyName);
 		return keyName + "élément supprimé";
 	}
 

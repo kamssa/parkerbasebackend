@@ -26,10 +26,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import ci.parkerbase.entity.entreprise.Departement;
 import ci.parkerbase.entity.entreprise.Dossier;
 import ci.parkerbase.entity.entreprise.InfoDoc;
@@ -206,11 +204,13 @@ public class InfoDocController {
 		Reponse<Boolean> reponse = null;
 
 		try {
-
+			InfoDoc doc = documentMetier.findById(id);
+			String keyName = doc.getNomDoc();
+            String nomDep = doc.getDepartement().getLibelle();
+	        String nomDossier = doc.getDossier().getLibelle();
 			List<String> messages = new ArrayList<>();
 			messages.add(String.format(" %s  a ete supprime", true));
-			InfoDoc db = documentMetier.findById(id);
-			s3Services.deleteFile(db.getDepartement().getLibelle(), db.getNomDoc());
+			s3Services.deleteFile(nomDep, nomDossier, keyName);
 			reponse = new Reponse<Boolean>(0, messages, documentMetier.supprimer(id));
               
 		} catch (RuntimeException e1) {
@@ -318,8 +318,13 @@ public String chercherDocParByMc(@RequestParam(value = "mc") String mc,
 		}
 	}
 	@DeleteMapping("/file/delete/{fileName}")
-	public ResponseEntity<String> deleteFile(@PathVariable String depName, @PathVariable String keyname){
-		return new ResponseEntity<>(s3Services.deleteFile(depName, keyname),HttpStatus.OK);
+	public ResponseEntity<String> deleteFile(@PathVariable Long id, @PathVariable String keyname){
+		 Dossier dossier = dossierMetier.getDossierById(id);
+		 System.out.println("voir dossier retourné: "+ dossier);
+		 String nomDossier = dossier.getLibelle();
+         Departement dep = dossier.getDepartement();
+         String depName = dep.getLibelle();
+		return new ResponseEntity<>(s3Services.deleteFile(depName, nomDossier, keyname),HttpStatus.OK);
 	}
 	// recuperer les images du site
 	@GetMapping(value = "/getImage/{version}/{idE}/{idD}/{nomDoc}", produces = MediaType.IMAGE_JPEG_VALUE)

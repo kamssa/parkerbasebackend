@@ -19,8 +19,8 @@ public interface InfoDocRepository extends JpaRepository<InfoDoc, Long>{
 	List<InfoDoc> chercherInfoDocParMc(String description, long id);
 	@Query("select infoDoc from InfoDoc infoDoc where infoDoc.description LIKE %?1% AND infoDoc.idEntreprise=?2")
 	List<InfoDoc> chercherInfoDocParEntrepriseMc(String description, long id);
-	@Query("select doc from InfoDoc doc where doc.departement.id=?1")
+	@Query("select doc from InfoDoc doc where doc.departement.id=?1 ORDER BY doc.nomDoc ASC")
 	List<InfoDoc> getInfoDocParDep(long id);
-	@Query("select doc from InfoDoc doc where doc.idEntreprise=?1")
+	@Query("select doc from InfoDoc doc where doc.idEntreprise=?1 ORDER BY doc.nomDoc ASC")
 	List<InfoDoc> getInfoDocParEntr(long id);
 }
