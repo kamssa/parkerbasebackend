@@ -99,28 +99,28 @@ public class ManagerController {
 		return jsonMapper.writeValueAsString(reponse);
 	}
 	@PutMapping("/manager")
-	public String update(@RequestBody Personne  modif) throws JsonProcessingException {
+	public String update(@RequestBody Manager  modif) throws JsonProcessingException {
 		System.out.println("modif recupere1:"+ modif);
-		Reponse<Personne> reponse = null;
-		Reponse<Personne> reponsePersModif = null;
-		Personne p = personneMetier.findById(modif.getId());
+		Reponse<Manager> reponse = null;
+		Reponse<Manager> reponsePersModif = null;
+		Manager p = managerMetier.findById(modif.getId());
 		if (p != null) {
 			try {
 				System.out.println("modif recupere2:"+ modif);
 				
-				Personne manager = personneMetier.modifier(modif);
+				Manager manager = managerMetier.modifier(modif);
 				List<String> messages = new ArrayList<>();
 				messages.add(String.format("%s a modifier avec succes", manager.getId()));
-				reponse = new Reponse<Personne>(0, messages, manager);
+				reponse = new Reponse<Manager>(0, messages, manager);
 			} catch (InvalideParkerBaseException e) {
 
-				reponse = new Reponse<Personne>(1, Static.getErreursForException(e), null);
+				reponse = new Reponse<Manager>(1, Static.getErreursForException(e), null);
 			}
 
 		} else {
 			List<String> messages = new ArrayList<>();
 			messages.add(String.format("Employe n'existe pas"));
-			reponse = new Reponse<Personne>(0, messages, null);
+			reponse = new Reponse<Manager>(0, messages, null);
 		}
 
 		return jsonMapper.writeValueAsString(reponse);
