@@ -32,7 +32,7 @@ PasswordEncoder passwordEncoder;
 			throw new InvalideParkerBaseException("Le email ne peut etre null");
 		}
 		
-		Optional<Employe> pers = null;
+		Optional<Employe> pers = null; 
 
 		pers = employeRepository.findByEmail(entity.getEmail());
 		if (pers.isPresent()) {
