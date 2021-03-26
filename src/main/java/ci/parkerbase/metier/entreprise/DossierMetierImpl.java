@@ -21,13 +21,7 @@ private DossierRepository dossierRepository;
 			throw new InvalideParkerBaseException("Le libelle ne peut etre null");
 		}
 		
-		Optional<Dossier> dos = null;
-
-        dos = dossierRepository.findByLibelle(entity.getLibelle());
-		if (dos.isPresent()) {
-			throw new InvalideParkerBaseException("Ce libelle est deja utilise");
-		}
-
+		
 		return dossierRepository.save(entity);
 	}
 

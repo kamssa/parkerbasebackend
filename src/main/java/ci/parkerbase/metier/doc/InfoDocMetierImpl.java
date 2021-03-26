@@ -26,13 +26,6 @@ public class InfoDocMetierImpl implements InfoDocMetier {
 			throw new InvalideParkerBaseException("Le libelle ne peut etre null");
 		}
 		
-		Optional<InfoDoc> doc = null;
-
-		doc = documentRepo.findByNomDoc(entity.getNomDoc());
-		if (doc.isPresent()) {
-			throw new InvalideParkerBaseException("Ce nom de  document est deja utilise");
-		}
-
 		
 		return documentRepo.save(entity);
 	}
