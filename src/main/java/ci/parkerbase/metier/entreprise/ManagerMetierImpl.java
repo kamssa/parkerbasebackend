@@ -13,6 +13,7 @@ public class ManagerMetierImpl implements IManagerMetier {
 private ManagerRepository managerRepository; 
 	@Override
 	public Manager creer(Manager entity) throws InvalideParkerBaseException {
+		
 		return managerRepository.save(entity);
 	}
 
@@ -33,7 +34,8 @@ private ManagerRepository managerRepository;
 
 	@Override
 	public boolean supprimer(Long id) {
-		return false;
+		managerRepository.deleteById(id);
+		return true;
 	}
 
 	@Override
