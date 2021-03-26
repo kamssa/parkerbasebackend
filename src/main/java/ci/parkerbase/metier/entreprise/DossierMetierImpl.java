@@ -1,11 +1,13 @@
 package ci.parkerbase.metier.entreprise;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import ci.parkerbase.dao.DossierRepository;
+import ci.parkerbase.entity.entreprise.Departement;
 import ci.parkerbase.entity.entreprise.Dossier;
 import ci.parkerbase.exception.InvalideParkerBaseException;
 
@@ -15,7 +17,17 @@ public class DossierMetierImpl implements IDossierMetier{
 private DossierRepository dossierRepository;
 	@Override
 	public Dossier creer(Dossier entity) throws InvalideParkerBaseException {
-			
+		if ((entity.getLibelle().equals(null)) || (entity.getLibelle() == "")) {
+			throw new InvalideParkerBaseException("Le libelle ne peut etre null");
+		}
+		
+		Optional<Dossier> dos = null;
+
+        dos = dossierRepository.findByLibelle(entity.getLibelle());
+		if (dos.isPresent()) {
+			throw new InvalideParkerBaseException("Ce libelle est deja utilise");
+		}
+
 		return dossierRepository.save(entity);
 	}
 

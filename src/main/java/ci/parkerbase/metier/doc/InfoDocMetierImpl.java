@@ -1,12 +1,15 @@
 package ci.parkerbase.metier.doc;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import ci.parkerbase.dao.InfoDocRepository;
+import ci.parkerbase.entity.entreprise.Departement;
 import ci.parkerbase.entity.entreprise.InfoDoc;
+import ci.parkerbase.exception.InvalideParkerBaseException;
 
 
 
@@ -18,7 +21,19 @@ public class InfoDocMetierImpl implements InfoDocMetier {
     private InfoDocRepository documentRepo;
 
 	@Override
-	public InfoDoc creer(InfoDoc entity) {
+	public InfoDoc creer(InfoDoc entity) throws InvalideParkerBaseException {
+		if ((entity.getLibelle().equals(null)) || (entity.getLibelle() == "")) {
+			throw new InvalideParkerBaseException("Le libelle ne peut etre null");
+		}
+		
+		Optional<InfoDoc> doc = null;
+
+		doc = documentRepo.findByLibelle(entity.getLibelle());
+		if (doc.isPresent()) {
+			throw new InvalideParkerBaseException("Ce libelle est deja utilise");
+		}
+
+		
 		return documentRepo.save(entity);
 	}
 
@@ -91,6 +106,11 @@ public class InfoDocMetierImpl implements InfoDocMetier {
 	@Override
 	public List<InfoDoc> getInfoDocParEntr(long id) {
 		return documentRepo.getInfoDocParEntr(id);
+	}
+
+	@Override
+	public List<InfoDoc> getInfoDocParDossier(long id) {
+		return documentRepo.getInfoDocParDossier(id);
 	}
 	
 	

@@ -93,17 +93,18 @@ public class InfoDocController {
 
 		return jsonMapper.writeValueAsString(reponse);
 	}
+
 	@PutMapping("/infoDoc")
-	public String update(@RequestBody InfoDoc  modif) throws JsonProcessingException {
+	public String update(@RequestBody InfoDoc modif) throws JsonProcessingException {
 
 		Reponse<InfoDoc> reponse = null;
 		Reponse<InfoDoc> reponsePersModif = null;
 		// on recupere abonnement a modifier
-		System.out.println("modif recupere1:"+ modif);
+		System.out.println("modif recupere1:" + modif);
 		reponsePersModif = getInfoDocById(modif.getId());
 		if (reponsePersModif.getBody() != null) {
 			try {
-				System.out.println("modif recupere2:"+ modif);
+				System.out.println("modif recupere2:" + modif);
 				InfoDoc infoDoc = documentMetier.modifier(modif);
 				List<String> messages = new ArrayList<>();
 				messages.add(String.format("%s a modifier avec succes", infoDoc.getId()));
@@ -146,6 +147,31 @@ public class InfoDocController {
 		return jsonMapper.writeValueAsString(reponse);
 
 	}
+
+//////////////////////////////////////////////////////////////////////////////////////base/////////////////////////////////////
+////////ramener tous les documents par dossier//////////////////////////////////////////////////
+	@GetMapping("/infoDocument/{id}")
+	public String findDocByDossier(@PathVariable Long id) throws JsonProcessingException {
+
+		Reponse<List<InfoDoc>> reponse;
+		try {
+			List<InfoDoc> documents = documentMetier.getInfoDocParDossier(id);
+
+			if (!documents.isEmpty()) {
+				reponse = new Reponse<List<InfoDoc>>(0, null, documents);
+			} else {
+				List<String> messages = new ArrayList<>();
+				messages.add("Pas de infoDoc enregistrés");
+				reponse = new Reponse<List<InfoDoc>>(2, messages, new ArrayList<>());
+			}
+
+		} catch (Exception e) {
+			reponse = new Reponse<List<InfoDoc>>(1, Static.getErreursForException(e), new ArrayList<>());
+		}
+		return jsonMapper.writeValueAsString(reponse);
+
+	}
+
 	// obtenir un infoDoc par son identifiant
 	@GetMapping("/infoDoc/{id}")
 	public String getDocById(@PathVariable Long id) throws JsonProcessingException {
@@ -159,45 +185,48 @@ public class InfoDocController {
 		return jsonMapper.writeValueAsString(reponse);
 
 	}
+
 	// obtenir un infoDoc par son identifiant
-		@GetMapping("/infoDocParDep/{id}")
-		public String getDocByIdDep(@PathVariable Long id) throws JsonProcessingException {
-			Reponse<List<InfoDoc>> reponse;
-			try {
-				List<InfoDoc> pers = documentMetier.getInfoDocParDep(id);
-				if (!pers.isEmpty()) {
-					reponse = new Reponse<List<InfoDoc>>(0, null, pers);
-				} else {
-					List<String> messages = new ArrayList<>();
-					messages.add("Pas de infodoc enregistrés");
-					reponse = new Reponse<List<InfoDoc>>(1, messages, new ArrayList<>());
-				}
-
-			} catch (Exception e) {
-				reponse = new Reponse<>(1, Static.getErreursForException(e), null);
+	@GetMapping("/infoDocParDep/{id}")
+	public String getDocByIdDep(@PathVariable Long id) throws JsonProcessingException {
+		Reponse<List<InfoDoc>> reponse;
+		try {
+			List<InfoDoc> pers = documentMetier.getInfoDocParDep(id);
+			if (!pers.isEmpty()) {
+				reponse = new Reponse<List<InfoDoc>>(0, null, pers);
+			} else {
+				List<String> messages = new ArrayList<>();
+				messages.add("Pas de infodoc enregistrés");
+				reponse = new Reponse<List<InfoDoc>>(1, messages, new ArrayList<>());
 			}
-			return jsonMapper.writeValueAsString(reponse);
 
+		} catch (Exception e) {
+			reponse = new Reponse<>(1, Static.getErreursForException(e), null);
 		}
-		// obtenir un infoDoc par son identifiant
-		@GetMapping("/infoDocParEntreprise/{id}")
-		public String getDocByIdEntr(@PathVariable Long id) throws JsonProcessingException {
-			Reponse<List<InfoDoc>> reponse;
-			try {
-				List<InfoDoc> pers = documentMetier.getInfoDocParEntr(id);
-				if (!pers.isEmpty()) {
-					reponse = new Reponse<List<InfoDoc>>(0, null, pers);
-				} else {
-					List<String> messages = new ArrayList<>();
-					messages.add("Pas de infodoc enregistrés");
-					reponse = new Reponse<List<InfoDoc>>(1, messages, new ArrayList<>());
-				}
+		return jsonMapper.writeValueAsString(reponse);
 
-			} catch (Exception e) {
-				reponse = new Reponse<>(1, Static.getErreursForException(e), null);
+	}
+
+	// obtenir un infoDoc par son identifiant
+	@GetMapping("/infoDocParEntreprise/{id}")
+	public String getDocByIdEntr(@PathVariable Long id) throws JsonProcessingException {
+		Reponse<List<InfoDoc>> reponse;
+		try {
+			List<InfoDoc> pers = documentMetier.getInfoDocParEntr(id);
+			if (!pers.isEmpty()) {
+				reponse = new Reponse<List<InfoDoc>>(0, null, pers);
+			} else {
+				List<String> messages = new ArrayList<>();
+				messages.add("Pas de infodoc enregistrés");
+				reponse = new Reponse<List<InfoDoc>>(1, messages, new ArrayList<>());
 			}
-			return jsonMapper.writeValueAsString(reponse);
+
+		} catch (Exception e) {
+			reponse = new Reponse<>(1, Static.getErreursForException(e), null);
 		}
+		return jsonMapper.writeValueAsString(reponse);
+	}
+
 	@DeleteMapping("/infoDoc/{id}")
 	public String supprimer(@PathVariable("id") Long id) throws JsonProcessingException {
 
@@ -206,13 +235,13 @@ public class InfoDocController {
 		try {
 			InfoDoc doc = documentMetier.findById(id);
 			String keyName = doc.getNomDoc();
-            String nomDep = doc.getDepartement().getLibelle();
-	        String nomDossier = doc.getDossier().getLibelle();
+			String nomDep = doc.getDepartement().getLibelle();
+			String nomDossier = doc.getDossier().getLibelle();
 			List<String> messages = new ArrayList<>();
 			messages.add(String.format(" %s  a ete supprime", true));
 			s3Services.deleteFile(nomDep, nomDossier, keyName);
 			reponse = new Reponse<Boolean>(0, messages, documentMetier.supprimer(id));
-              
+
 		} catch (RuntimeException e1) {
 			reponse = new Reponse<>(3, Static.getErreursForException(e1), false);
 		}
@@ -222,8 +251,8 @@ public class InfoDocController {
 
 ////////rechercher un infoDoc par mot cle
 	@GetMapping("/rechemc")
-	public String chercherTravauxByMc(@RequestParam(value = "mc") String mc, 
-			@RequestParam(value = "id") Long id) throws JsonProcessingException {
+	public String chercherTravauxByMc(@RequestParam(value = "mc") String mc, @RequestParam(value = "id") Long id)
+			throws JsonProcessingException {
 
 		Reponse<List<InfoDoc>> reponse;
 		try {
@@ -243,89 +272,91 @@ public class InfoDocController {
 		return jsonMapper.writeValueAsString(reponse);
 
 	}
+
 ////////rechercher un infoDoc par mot cle
-@GetMapping("/recheParentreprisemc")
-public String chercherDocParByMc(@RequestParam(value = "mc") String mc, 
-		@RequestParam(value = "id") Long id) throws JsonProcessingException {
+	@GetMapping("/recheParentreprisemc")
+	public String chercherDocParByMc(@RequestParam(value = "mc") String mc, @RequestParam(value = "id") Long id)
+			throws JsonProcessingException {
 
-	Reponse<List<InfoDoc>> reponse;
-	try {
-		List<InfoDoc> infoDoc = documentMetier.chercherInfoDocParEntrepriseMc(mc, id);
+		Reponse<List<InfoDoc>> reponse;
+		try {
+			List<InfoDoc> infoDoc = documentMetier.chercherInfoDocParEntrepriseMc(mc, id);
 
-		if (!infoDoc.isEmpty()) {
-			reponse = new Reponse<List<InfoDoc>>(0, null, infoDoc);
-		} else {
-			List<String> messages = new ArrayList<>();
-			messages.add("Pas de infoDoc info enregistrés");
-			reponse = new Reponse<List<InfoDoc>>(2, messages, new ArrayList<>());
+			if (!infoDoc.isEmpty()) {
+				reponse = new Reponse<List<InfoDoc>>(0, null, infoDoc);
+			} else {
+				List<String> messages = new ArrayList<>();
+				messages.add("Pas de infoDoc info enregistrés");
+				reponse = new Reponse<List<InfoDoc>>(2, messages, new ArrayList<>());
+			}
+
+		} catch (Exception e) {
+			reponse = new Reponse<List<InfoDoc>>(1, Static.getErreursForException(e), new ArrayList<>());
 		}
+		return jsonMapper.writeValueAsString(reponse);
 
-	} catch (Exception e) {
-		reponse = new Reponse<List<InfoDoc>>(1, Static.getErreursForException(e), new ArrayList<>());
 	}
-	return jsonMapper.writeValueAsString(reponse);
 
-}
-
-	
 	@PostMapping("/file/upload")
-	public String uploadMultipartFile(@RequestParam Long id, @RequestParam("file") MultipartFile file) throws JsonProcessingException {
+	public String uploadMultipartFile(@RequestParam Long id, @RequestParam("file") MultipartFile file)
+			throws JsonProcessingException {
 		Reponse<ResponseEntity<?>> reponse;
 		System.out.println("Voir id:" + id);
 		Dossier dossier = dossierMetier.findById(id);
 		String nomDossier = dossier.getLibelle();
-        Departement dep = dossier.getDepartement();
-        String nomDep = dep.getLibelle();
+		Departement dep = dossier.getDepartement();
+		String nomDep = dep.getLibelle();
 		String keyName = file.getOriginalFilename();
 		System.out.println("Voir ce qui se passe:" + keyName);
-        s3Services.uploadFile(nomDep,nomDossier, keyName, file);
+		s3Services.uploadFile(nomDep, nomDossier, keyName, file);
 		List<String> messages = new ArrayList<>();
 		messages.add(String.format("Upload Successfully" + keyName));
 		reponse = new Reponse<ResponseEntity<?>>(0, messages, null);
 
 		return jsonMapper.writeValueAsString(reponse);
 	}
+
 	@GetMapping("/file/download")
-	public ResponseEntity<ByteArrayResource> downloadFile(
-			@RequestParam Long id,
-			@RequestParam String keyname) {
-		    System.out.println("voir dossier retourné: "+id);
-		    System.out.println("voir dossier retourné: "+ keyname);
-		    Dossier dossier = dossierMetier.getDossierById(id);
-		    System.out.println("voir dossier retourné: "+ dossier);
-		    String nomDossier = dossier.getLibelle();
-            Departement dep = dossier.getDepartement();
-            String depName = dep.getLibelle();
-            byte [] data = s3Services.downloadFile(depName, nomDossier, keyname);
-            ByteArrayResource resource = new ByteArrayResource(data);
-		    return ResponseEntity.ok()
-					.contentLength(data.length)
-					.header("content-type", "application/octet-stream")
-					.header(HttpHeaders.CONTENT_DISPOSITION,"attachment; filename=\"" + keyname + "\"")
-					.body(resource);
-		    
-						
+	public ResponseEntity<ByteArrayResource> downloadFile(@RequestParam Long id, @RequestParam String keyname) {
+		System.out.println("voir dossier retourné: " + id);
+		System.out.println("voir dossier retourné: " + keyname);
+		Dossier dossier = dossierMetier.getDossierById(id);
+		System.out.println("voir dossier retourné: " + dossier);
+		String nomDossier = dossier.getLibelle();
+		Departement dep = dossier.getDepartement();
+		String depName = dep.getLibelle();
+		byte[] data = s3Services.downloadFile(depName, nomDossier, keyname);
+		ByteArrayResource resource = new ByteArrayResource(data);
+		return ResponseEntity.ok().contentLength(data.length).header("content-type", "application/octet-stream")
+				.header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + keyname + "\"").body(resource);
+
 	}
-	
+
 	private MediaType contentType(String keyname) {
 		String[] arr = keyname.split("\\.");
-		String type = arr[arr.length-1];
-		switch(type) {
-			case "txt": return MediaType.TEXT_PLAIN;
-			case "png": return MediaType.IMAGE_PNG;
-			case "jpg": return MediaType.IMAGE_JPEG;
-			default: return MediaType.APPLICATION_OCTET_STREAM;
+		String type = arr[arr.length - 1];
+		switch (type) {
+		case "txt":
+			return MediaType.TEXT_PLAIN;
+		case "png":
+			return MediaType.IMAGE_PNG;
+		case "jpg":
+			return MediaType.IMAGE_JPEG;
+		default:
+			return MediaType.APPLICATION_OCTET_STREAM;
 		}
 	}
+
 	@DeleteMapping("/file/delete/{fileName}")
-	public ResponseEntity<String> deleteFile(@PathVariable Long id, @PathVariable String keyname){
-		 Dossier dossier = dossierMetier.getDossierById(id);
-		 System.out.println("voir dossier retourné: "+ dossier);
-		 String nomDossier = dossier.getLibelle();
-         Departement dep = dossier.getDepartement();
-         String depName = dep.getLibelle();
-		return new ResponseEntity<>(s3Services.deleteFile(depName, nomDossier, keyname),HttpStatus.OK);
+	public ResponseEntity<String> deleteFile(@PathVariable Long id, @PathVariable String keyname) {
+		Dossier dossier = dossierMetier.getDossierById(id);
+		System.out.println("voir dossier retourné: " + dossier);
+		String nomDossier = dossier.getLibelle();
+		Departement dep = dossier.getDepartement();
+		String depName = dep.getLibelle();
+		return new ResponseEntity<>(s3Services.deleteFile(depName, nomDossier, keyname), HttpStatus.OK);
 	}
+
 	// recuperer les images du site
 	@GetMapping(value = "/getImage/{version}/{idE}/{idD}/{nomDoc}", produces = MediaType.IMAGE_JPEG_VALUE)
 	public byte[] getPhotosTravaux(@PathVariable Long version, @PathVariable Long idE, @PathVariable Long idD,
