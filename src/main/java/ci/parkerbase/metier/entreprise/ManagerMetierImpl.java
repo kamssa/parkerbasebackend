@@ -36,7 +36,7 @@ PasswordEncoder passwordEncoder;
 		 String nomComplet = modif.getNom() + " " + modif.getPrenom();
 		 modif.setNomComplet(nomComplet); 
 		modif.setPassword(passwordEncoder.encode(modif.getPassword()));
-         Role userRole = roleRepository.findByName(RoleName.ROLE_EMPLOYE).get();
+         Role userRole = roleRepository.findByName(RoleName.ROLE_MANAGER).get();
          modif.setRoles(Collections.singleton(userRole));
          return managerRepository.save(modif);
 	}
