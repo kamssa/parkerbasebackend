@@ -28,9 +28,9 @@ public class InfoDocMetierImpl implements InfoDocMetier {
 		
 		Optional<InfoDoc> doc = null;
 
-		doc = documentRepo.findByLibelle(entity.getLibelle());
+		doc = documentRepo.findByNomDoc(entity.getNomDoc());
 		if (doc.isPresent()) {
-			throw new InvalideParkerBaseException("Ce libelle est deja utilise");
+			throw new InvalideParkerBaseException("Ce nom de  document est deja utilise");
 		}
 
 		
