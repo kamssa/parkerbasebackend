@@ -20,14 +20,6 @@ private DepartementRepository departementRepository;
 		if ((entity.getLibelle().equals(null)) || (entity.getLibelle() == "")) {
 			throw new InvalideParkerBaseException("Le libelle ne peut etre null");
 		}
-		
-		Optional<Departement> dep = null;
-
-		dep = departementRepository.findByLibelle(entity.getLibelle());
-		if (dep.isPresent()) {
-			throw new InvalideParkerBaseException("Ce libelle est deja utilise");
-		}
-
 		return departementRepository.save(entity);
 	}
 
