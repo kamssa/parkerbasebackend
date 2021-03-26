@@ -1,6 +1,7 @@
 package ci.parkerbase.dao;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -13,4 +14,6 @@ public interface DossierRepository extends JpaRepository<Dossier, Long>{
 	List<Dossier> getDossierByIdDep(long id);
 	@Query("select d from Dossier d where d.id=?1")
 	Dossier getDossierById(long id);
+	Optional<Dossier> findByLibelle(String libelle);
+
 }

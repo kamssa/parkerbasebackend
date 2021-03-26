@@ -14,5 +14,7 @@ public interface InfoDocMetier extends Imetier<InfoDoc, Long> {
 	List<InfoDoc> chercherInfoDocParEntrepriseMc(String mc, long id);
 	List<InfoDoc> getInfoDocParDep(long id);
 	List<InfoDoc> getInfoDocParEntr(long id);
+	List<InfoDoc> getInfoDocParDossier(long id);
+
 	
 	}

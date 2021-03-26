@@ -23,4 +23,6 @@ public interface InfoDocRepository extends JpaRepository<InfoDoc, Long>{
 	List<InfoDoc> getInfoDocParDep(long id);
 	@Query("select doc from InfoDoc doc where doc.idEntreprise=?1 ORDER BY doc.nomDoc ASC")
 	List<InfoDoc> getInfoDocParEntr(long id);
+	@Query("select doc from InfoDoc doc where doc.dossier=?1 ORDER BY doc.nomDoc ASC")
+	List<InfoDoc> getInfoDocParDossier(long id);
 }

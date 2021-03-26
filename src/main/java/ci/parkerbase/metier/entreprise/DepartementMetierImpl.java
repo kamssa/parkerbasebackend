@@ -1,12 +1,14 @@
 package ci.parkerbase.metier.entreprise;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import ci.parkerbase.dao.DepartementRepository;
 import ci.parkerbase.entity.entreprise.Departement;
+import ci.parkerbase.entity.entreprise.Employe;
 import ci.parkerbase.exception.InvalideParkerBaseException;
 
 @Service
@@ -15,6 +17,17 @@ public class DepartementMetierImpl implements IDepartementMetier{
 private DepartementRepository departementRepository;
 	@Override
 	public Departement creer(Departement entity) throws InvalideParkerBaseException {
+		if ((entity.getLibelle().equals(null)) || (entity.getLibelle() == "")) {
+			throw new InvalideParkerBaseException("Le libelle ne peut etre null");
+		}
+		
+		Optional<Departement> dep = null;
+
+		dep = departementRepository.findByLibelle(entity.getLibelle());
+		if (dep.isPresent()) {
+			throw new InvalideParkerBaseException("Ce libelle est deja utilise");
+		}
+
 		return departementRepository.save(entity);
 	}
 
