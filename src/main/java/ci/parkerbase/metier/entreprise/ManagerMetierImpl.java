@@ -33,7 +33,9 @@ PasswordEncoder passwordEncoder;
 
 	@Override
 	public Manager modifier(Manager modif) throws InvalideParkerBaseException {
-		 modif.setPassword(passwordEncoder.encode(modif.getPassword()));
+		 String nomComplet = modif.getNom() + " " + modif.getPrenom();
+		 modif.setNomComplet(nomComplet); 
+		modif.setPassword(passwordEncoder.encode(modif.getPassword()));
          Role userRole = roleRepository.findByName(RoleName.ROLE_EMPLOYE).get();
          modif.setRoles(Collections.singleton(userRole));
          return managerRepository.save(modif);
