@@ -19,10 +19,10 @@ public class ParkerbaseApplication implements CommandLineRunner{
 	}
 	@Override
 	public void run(String... args) throws Exception {
-		this.roleRepository.save(new Role(RoleName.ROLE_ADMIN));
+		/*this.roleRepository.save(new Role(RoleName.ROLE_ADMIN));
 		this.roleRepository.save(new Role(RoleName.ROLE_EMPLOYE));
 		this.roleRepository.save(new Role(RoleName.ROLE_MANAGER));
-		this.roleRepository.save(new Role(RoleName.ROLE_USER));
+		this.roleRepository.save(new Role(RoleName.ROLE_USER));*/
 		
 	}
 
